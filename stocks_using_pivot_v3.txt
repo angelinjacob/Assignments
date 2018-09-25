@@ -1,0 +1,163 @@
+Sub stocks_using_pivot()
+'1. created pivot table in a new sheet
+'2. sorted the raw data for the year; first with <ticker> and then with <date>
+Dim num_rows_pivot As Integer
+Dim num_rows_raw As Long
+Dim current_year As Integer
+Dim pivot_sheet_name As String
+
+'3. populate the raw data for the year with the aggregate from the pivot table
+current_year = CInt(ActiveSheet.Name)
+pivot_sheet_name = "pivot_" & current_year
+
+num_rows_pivot = ActiveWorkbook.Worksheets(pivot_sheet_name).Cells(Rows.Count, 1).End(xlUp).Row ' - 4
+num_rows_raw = ActiveWorkbook.Worksheets(ActiveSheet.Name).Cells(Rows.Count, 1).End(xlUp).Row
+Cells(1, 9).Value = "Ticker"
+Cells(1, 12).Value = "Total Stock Volume"
+For i = 4 To num_rows_pivot - 2
+    Cells(i - 2, 9).Value = ActiveWorkbook.Worksheets(pivot_sheet_name).Cells(i, 1)
+    Cells(i - 2, 12).Value = ActiveWorkbook.Worksheets(pivot_sheet_name).Cells(i, 2)
+Next i
+
+'4. look for the first record of each <ticker>
+'5. get the <open> rate
+'6. look for the last record of each <ticker>
+'7. get the <close> rate
+'8. calculate the difference and percentage
+'9. populate the cells
+'10. goto step 4 until all the pivot records are processed
+
+Cells(1, 10).Value = "Yearly Change"
+Cells(1, 11).Value = "Percent Change"
+Cells(9, 15).Value = "Ticker"
+Cells(9, 16).Value = "Value"
+Cells(10, 14).Value = "Greatest percentage Increase"
+Cells(11, 14).Value = "Greatest percentage Decrease"
+Cells(12, 14).Value = "Greatest Volume"
+Dim greatest_ticker As String
+Dim least_ticker As String
+Dim greatest_vol_ticker As String
+Dim greatest_perc As Double
+Dim least_perc As Double
+Dim greatest_vol As Double
+
+If Not IsEmpty(Cells(10, 15)) Then
+    greatest_ticker = Cells(10, 15)
+Else
+    greatest_ticker = Cells(10, 15).Value = Cells(2, 9).Value
+End If
+If Not IsEmpty(Cells(11, 15)) Then
+    least_ticker = Cells(11, 15)
+Else
+    least_ticker = Cells(11, 15).Value = Cells(2, 9).Value
+End If
+If Not IsEmpty(Cells(12, 15)) Then
+    greatest_vol_ticker = Cells(12, 15)
+Else
+    greatest_vol_ticker = Cells(12, 15).Value = Cells(2, 9).Value
+End If
+If Not IsEmpty(Cells(10, 16)) Then
+    greatest_perc = Cells(10, 16)
+Else
+    greatest_perc = Cells(10, 16).Value = Cells(2, 11).Value
+End If
+If Not IsEmpty(Cells(11, 16)) Then
+    least_perc = Cells(11, 16)
+Else
+    least_perc = Cells(11, 16).Value = Cells(2, 11).Value
+End If
+If Not IsEmpty(Cells(12, 16)) Then
+    greatest_vol = Cells(12, 16)
+Else
+    greatest_vol = Cells(12, 16).Value = Cells(2, 12).Value
+End If
+
+'look for open and close value to calculate yearly and percentage change
+'figure out the greatest and least percentage increase/decrease and greatest volume on the way
+Dim found As Integer
+For k = 2 To num_rows_pivot - 3 '3 to address the extra header rows
+    open_rate = 0
+    close_rate = 0
+    found = 0
+    i = 2
+    'find <open> value for the ticker
+    Do While i < num_rows_raw And found = 0
+        If Cells(k, 9).Value = Cells(i, 1).Value And Cells(i, 3) <> 0 Then
+            found = 1
+            open_rate = Cells(i, 3).Value
+        End If
+        i = i + 1
+    Loop
+    'scan until you find the last record for the ticker in the sorted column
+    Do While i <= num_rows_raw And found = 1
+        If Cells(k, 9).Value <> Cells(i, 1).Value Then
+            close_rate = Cells(i - 1, 6).Value
+            Cells(k, 10).Value = close_rate - open_rate
+            If Cells(k, 10).Value > 0 Then
+                Cells(k, 10).Interior.ColorIndex = 4
+            Else
+                Cells(k, 10).Interior.ColorIndex = 3
+            End If
+            If open_rate <> 0 And close_rate <> 0 Then
+                Cells(k, 11).Value = ((close_rate - open_rate) / open_rate)
+            Else
+                Cells(k, 11).Value = 0
+            End If
+            found = 0
+            If greatest_perc < Cells(k, 11).Value Then
+                greatest_perc = Cells(k, 11).Value
+                greatest_ticker = Cells(k, 9).Value
+                Cells(10, 15).Value = greatest_ticker
+                Cells(10, 16).Value = greatest_perc
+            End If
+            If least_perc > Cells(k, 11).Value Then
+                least_perc = Cells(k, 11).Value
+                least_ticker = Cells(k, 9).Value
+                Cells(11, 15).Value = least_ticker
+                Cells(11, 16).Value = least_perc
+            End If
+            If greatest_vol < Cells(k, 12).Value Then
+                greatest_vol = Cells(k, 12).Value
+                greatest_vol_ticker = Cells(k, 9).Value
+                Cells(12, 15).Value = greatest_vol_ticker
+                Cells(12, 16).Value = greatest_vol
+            End If
+        End If
+        i = i + 1
+    Loop
+    'to process the last record in the sorted ticker from raw data
+    If i > num_rows_raw And found = 1 And k = num_rows_pivot - 4 Then
+        close_rate = Cells(i - 1, 6).Value
+        Cells(k, 10).Value = close_rate - open_rate
+        If Cells(k, 10).Value > 0 Then
+            Cells(k, 10).Interior.ColorIndex = 4
+        Else
+            Cells(k, 10).Interior.ColorIndex = 3
+        End If
+        If open_rate <> 0 And close_rate <> 0 Then
+            Cells(k, 11).Value = ((close_rate - open_rate) / open_rate)
+        Else
+            Cells(k, 11).Value = 0
+        End If
+        found = 0
+        If greatest_perc < Cells(k, 11).Value Then
+            greatest_perc = Cells(k, 11).Value
+            greatest_ticker = Cells(k, 9).Value
+            Cells(10, 15).Value = greatest_ticker
+            Cells(10, 16).Value = greatest_perc
+        End If
+        If least_perc > Cells(k, 11).Value Then
+            least_perc = Cells(k, 11).Value
+            least_ticker = Cells(k, 9).Value
+            Cells(11, 15).Value = least_ticker
+            Cells(11, 16).Value = least_perc
+        End If
+        If greatest_vol < Cells(k, 12).Value Then
+            greatest_vol = Cells(k, 12).Value
+            greatest_vol_ticker = Cells(k, 9).Value
+            Cells(12, 15).Value = greatest_vol_ticker
+            Cells(12, 16).Value = greatest_vol
+        End If
+    End If
+Next k
+End Sub

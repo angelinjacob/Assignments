@@ -1,0 +1,28 @@
+Notes:
+
+ASSIGNMENT EASY : Running through large data of around 700,000 on 3 sheets took more than half hour. VB script available in <stocks_by_ticker.txt>. Did not continue to do moderate and hard this way
+
+ASSIGNMENT MODERATE AND HARD:
+- Creating pivot table on tickers vs aggregate volume and then doing the summary takes less than 3 minutes. VB script available in <stocks_using_pivot_v3.txt>
+
+'1. create pivot table in a new sheet 
+'2. sort the raw data for the year; first with <ticker> and then with <date>
+' *****make the "active sheet" as the year you want to run, eg, choose 2014 and run the macro to reference the matching pivot for that year. Tried running for all at once and performance was terrible, so, chose to do one year at a time!
+execute macro - stocks_using_pivot
+'3. populates the raw data for the year with the aggregate from the pivot table
+'4. looks for the first record of each <ticker>
+'5. gets the <open> rate
+'6. looks for the last record of each <ticker>
+'7. gets the <close> rate
+'8. calculates the difference and percentage. check for the greatest/lease percentage along the way
+'9. populates the cells
+'10. goto step 4 until all the pivot records are processed
+
+
+- Used <stocks_by_pivot> approach for the moderate and hard exercise to save execution time
+- <open>, <close>, <volume> for the <ticker> can be zero for few months as witnessed. was not sure if we can REMOVE the records with zero or inconsistent values. 
+- Kept the records with zero values and coded accordingly which increased the execution time exponentially due to the additional conditional statements
+
+- missed paying attention to the row header positioning in the HARD assignment. you would find the results starting ROW 10 and not in ROW 1.  Did not spend time in fixing this! Hope that is fine! 
+
+
