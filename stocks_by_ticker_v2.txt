@@ -6,7 +6,7 @@ Sub stocks_by_ticker_v2()
     
     num_worksheets = ActiveWorkbook.Worksheets.Count
         
-    tickers_count = 0
+    'tickers_count = 0
     'If Not IsEmpty(ActiveWorkbook.Worksheets(i).Cells(2, 1)) Then
     '    tickers_name(tickers_count) = ActiveWorkbook.Worksheets(1).Cells(2, 1).Value
     '    tickers_vol(tickers_count) = Cells(2, 7).Value
@@ -15,13 +15,13 @@ Sub stocks_by_ticker_v2()
     
     For i = 1 To num_worksheets
         num_rows = ActiveWorkbook.Worksheets(i).Cells(Rows.Count, 1).End(xlUp).Row
-    tickers_count = 0
+        tickers_count = 0
         If Not IsEmpty(ActiveWorkbook.Worksheets(i).Cells(2, 1)) Then
             tickers_name(tickers_count) = ActiveWorkbook.Worksheets(1).Cells(2, 1).Value
             tickers_vol(tickers_count) = ActiveWorkbook.Worksheets(1).Cells(2, 7).Value
             tickers_count = tickers_count + 1
         End If
-        For j = 3 To 10000 'num_rows
+        For j = 3 To num_rows
             For tick_cnt = 0 To tickers_count
                 If ActiveWorkbook.Worksheets(i).Cells(j, 1).Value = tickers_name(tick_cnt) Then
                    tickers_vol(tick_cnt) = ActiveWorkbook.Worksheets(i).Cells(j, 7).Value + tickers_vol(tick_cnt)
