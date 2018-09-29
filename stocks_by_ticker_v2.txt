@@ -1,0 +1,44 @@
+Sub stocks_by_ticker_v2()
+    Dim temp As Long
+    Dim tickers_vol(4000) As Double
+    Dim tickers_name(4000) As String
+    Dim tickers_count As Integer
+    
+    num_worksheets = ActiveWorkbook.Worksheets.Count
+        
+    tickers_count = 0
+    'If Not IsEmpty(ActiveWorkbook.Worksheets(i).Cells(2, 1)) Then
+    '    tickers_name(tickers_count) = ActiveWorkbook.Worksheets(1).Cells(2, 1).Value
+    '    tickers_vol(tickers_count) = Cells(2, 7).Value
+    '    tickers_count = tickers_count + 1
+    'End If
+    
+    For i = 1 To num_worksheets
+        num_rows = ActiveWorkbook.Worksheets(i).Cells(Rows.Count, 1).End(xlUp).Row
+    tickers_count = 0
+        If Not IsEmpty(ActiveWorkbook.Worksheets(i).Cells(2, 1)) Then
+            tickers_name(tickers_count) = ActiveWorkbook.Worksheets(1).Cells(2, 1).Value
+            tickers_vol(tickers_count) = ActiveWorkbook.Worksheets(1).Cells(2, 7).Value
+            tickers_count = tickers_count + 1
+        End If
+        For j = 3 To 10000 'num_rows
+            For tick_cnt = 0 To tickers_count
+                If ActiveWorkbook.Worksheets(i).Cells(j, 1).Value = tickers_name(tick_cnt) Then
+                   tickers_vol(tick_cnt) = ActiveWorkbook.Worksheets(i).Cells(j, 7).Value + tickers_vol(tick_cnt)
+                   Exit For
+                End If
+             Next tick_cnt
+             If tick_cnt > tickers_count Then
+                tickers_name(tickers_count) = ActiveWorkbook.Worksheets(i).Cells(j, 1).Value
+                tickers_count = tickers_count + 1
+                tickers_vol(tick_cnt) = tickers_vol(tick_cnt) + ActiveWorkbook.Worksheets(i).Cells(j, 7).Value
+             End If
+        Next j
+        ActiveWorkbook.Worksheets(i).Cells(1, 10) = "Tickers"
+        ActiveWorkbook.Worksheets(i).Cells(1, 11) = "total volume"
+        For k = 0 To tickers_count
+            ActiveWorkbook.Worksheets(i).Cells(k + 2, 10).Value = tickers_name(k)
+            ActiveWorkbook.Worksheets(i).Cells(k + 2, 11).Value = tickers_vol(k)
+        Next k
+    Next i
+End Sub
