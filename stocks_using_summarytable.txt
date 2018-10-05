@@ -1,0 +1,37 @@
+Sub third_try()
+Dim Summary_Table_Row As Integer
+ 'Range("I1").Value = "Ticker"
+ 'Range("J1").Value = "Volume Total"
+
+num_worksheets = ActiveWorkbook.Worksheets.Count
+
+For k = 1 To num_worksheets
+    num_rows = ActiveWorkbook.Worksheets(k).Cells(Rows.Count, 1).End(xlUp).Row
+    ActiveWorkbook.Worksheets(k).Range("I1").Value = "Ticker"
+    ActiveWorkbook.Worksheets(k).Range("J1").Value = "Volume Total"
+    Summary_Table_Row = 2
+' Loop through all credit card purchases
+For i = 2 To num_rows - 1
+   ' Check if we are still within the same credit card brand, if it is not...
+   If ActiveWorkbook.Worksheets(k).Cells(i + 1, 1).Value <> ActiveWorkbook.Worksheets(k).Cells(i, 1).Value Then
+     ' Set the Brand name
+     ticker = ActiveWorkbook.Worksheets(k).Cells(i, 1).Value
+     ' Add to the Brand Total
+     volume_total = volume_total + ActiveWorkbook.Worksheets(k).Cells(i, 7).Value
+     ' Print the Credit Card Brand in the Summary Table
+     ActiveWorkbook.Worksheets(k).Range("I" & Summary_Table_Row).Value = ticker
+     ' Print the Brand Amount to the Summary Table
+     ActiveWorkbook.Worksheets(k).Range("J" & Summary_Table_Row).Value = volume_total
+     ' Add one to the summary table row
+     Summary_Table_Row = Summary_Table_Row + 1
+     ' Reset the Brand Total
+    volume_total = 0
+   ' If the cell immediately following a row is the same brand...
+   Else
+     ' Add to the Brand Total
+     volume_total = volume_total + ActiveWorkbook.Worksheets(k).Cells(i, 7).Value
+  End If
+Next i
+
+Next k
+End Sub
